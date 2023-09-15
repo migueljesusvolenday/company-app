@@ -1,0 +1,74 @@
+.form {
+	margin: 100px auto;
+	max-width: 500px;
+	padding: 1em;
+	border: 1px solid #ccc;
+	border-radius: 1em;
+	width: 100%;
+}
+
+.lista {
+	margin: 100px auto;
+	max-width: 1000px;
+	padding: 1em;
+	border: 1px solid #ccc;
+	border-radius: 1em;
+	width: 100%;
+	text-align: center;
+}
+
+.lista h1 {
+	margin-bottom: 10px;
+}
+
+.label {
+	display: block;
+	margin: 1rem;
+	font-size: 20px;
+	width: 100%;
+}
+
+.label input {
+	margin-left: 10px;
+	font-size: 20px;
+	padding: 0.5rem 1rem;
+	border-radius: 10px;
+}
+.create {
+	display: block;
+	padding: 0.5rem 1rem;
+	width: 100%;
+	font-size: 20px;
+	border: none;
+	background-color: rgb(83, 204, 83);
+	border-radius: 10px;
+}
+
+.id {
+	padding: 0.5rem 1rem;
+	font-size: 20px;
+	border: none;
+	background-color: rgb(83, 204, 83);
+	border-radius: 10px;
+}
+
+ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+li {
+	padding: 10px;
+	margin: 10px;
+}
+
+li span {
+	margin-right: 10px;
+}
+
+.showdata span {
+	margin: 1rem;
+	font-size: 20px;
+	display: block;
+}
