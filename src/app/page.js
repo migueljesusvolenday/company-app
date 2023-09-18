@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { userSchema, userSchemaUpdate } from '@/app/validations/UserValidation';
+import * as yup from 'yup';
 import './styles/page.css';
 
 export default function Home() {
@@ -19,6 +21,12 @@ export default function Home() {
 
 	const list = useRef(null);
 	const showdata = useRef(null);
+	const lista = useRef();
+	const createForm = useRef();
+	const updateForm = useRef();
+	const showDataForm = useRef();
+	const deleteForm = useRef();
+
 
 	function dateFormat(dateToformat) {
 		let index = dateToformat.indexOf('T');
@@ -26,45 +34,103 @@ export default function Home() {
 		return date;
 	}
 
-	const hundleList = async e => {
-		e.preventDefault();
+	useEffect(() => {
 
-		list.current.innerHTML = '';
-		const data = await fetch('/api/getAll', {
-			method: 'post'
-		});
-		const users = await data.json();
-		console.log(users);
-		users.forEach(item => {
-			item.birthday = dateFormat(item.birthday);
+		handleList();
+		
+	}, [firstname, deleteId, updatefirstname, updatelastname
+		, updatebirthday,]);
+	
+	const handleEdit = (evt) => {
+		evt.preventDefault();
+		let idToUpdate = evt.target.parentNode.firstChild.textContent;
+		idToUpdate = idToUpdate.substring(4, idToUpdate.length);
+		setUpdateId(idToUpdate);
+		showHideToggle();
+	}
 
-			list.current.innerHTML += `<li><span>ID: ${item.id}</span><span> Firstname: ${item.firstname}</span><span>  Lastname: ${item.lastname}</span><span> Birthday: ${item.birthday}</span><span>  Age: ${item.age}</span></li>`;
-		});
+	async function handleList() {
+		
+		try {
+			list.current.innerHTML = '';
+			const data = await fetch('/api/getAll', {
+				method: 'post'
+			});
+			const users = await data.json();
+			console.log(users);
+			users.forEach(item => {
+				item.birthday = dateFormat(item.birthday);
+	
+				let li = document.createElement("li"); // Crear el elemento li
+				let spanId = document.createElement("span"); // Crear el elemento span para el id
+				spanId.textContent = `ID: ${item.id}`; // Asignar el texto al span
+				li.appendChild(spanId); // Agregar el span al li
+				let spanFirstname = document.createElement("span"); // Crear el elemento span para el firstname
+				spanFirstname.textContent = `Firstname: ${item.firstname}`; // Asignar el texto al span
+				li.appendChild(spanFirstname); // Agregar el span al li
+				let spanLastname = document.createElement("span"); // Crear el elemento span para el firstname
+				spanLastname.textContent = `Lastname: ${item.lastname}`; // Asignar el texto al span
+				li.appendChild(spanLastname); // Agregar el span al li
+				let spanBirthday = document.createElement("span"); // Crear el elemento span para el firstname
+				spanBirthday.textContent = `Birthday: ${item.birthday}`; // Asignar el texto al span
+				li.appendChild(spanBirthday); // Agregar el span al li
+				let spanAge = document.createElement("span"); // Crear el elemento span para el firstname
+				spanAge.textContent = `Birthday: ${item.age}`; // Asignar el texto al span
+				li.appendChild(spanAge); // Agregar el span al li
+				let button = document.createElement("button"); // Crear el elemento button
+				button.textContent = "Edit"; // Asignar el texto al button
+				button.addEventListener("click", handleEdit); // Asignar el evento onClick al button
+				li.appendChild(button); // Agregar el button al li
+				list.current.appendChild(li); // Agregar el li al elemento list
+							
+				
+	
+			});
+	
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
-	const hundleCreate = async evt => {
+
+	const handleCreate = async evt => {
 		evt.preventDefault();
-
-		let edad = getAge(birthday);
-
-		const response = await fetch('/api/createUser', {
-			method: 'post',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
+		try {
+			let user = {
 				firstname: firstname,
 				lastname: lastname,
 				birthday: birthday,
-				age: edad
-			})
-		});
-		const data = await response.json();
-		console.log(data);
+			}
+			let edad = getAge(birthday);
+			await userSchema.validate(user, { abortEarly: false });
 
-		setFirstName('');
-		setLastName('');
-		setBirthday('');
+			const response = await fetch('/api/createUser', {
+				method: 'post',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					firstname: firstname,
+					lastname: lastname,
+					birthday: birthday,
+					age: edad
+				})
+			});
+			const data = await response.json();
+			console.log(data);
+			setFirstName('');
+			setLastName('');
+			setBirthday('');
+	
+	
+		} catch (error) {
+			console.log(error);
+			for (let i = 0; i < error.errors.length; i++) {
+				alert(error.errors[i]);
+				
+			}
+		}
+
 	};
 
 	function getAge(fecha) {
@@ -94,58 +160,90 @@ export default function Home() {
 		return edad;
 	}
 
-	const hundleGetId = async evt => {
+	const handleGetId = async evt => {
 		evt.preventDefault();
 		console.log(id);
-		const response = await fetch('/api/getId', {
-			method: 'post',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				id: id
-			})
-		});
-		const data = await response.json();
-		console.log(data);
-		if (data.firstname === undefined) {
-			showdata.current.innerHTML = `<span> Employee not found</span>`;
-		} else {
-			data.birthday = dateFormat(data.birthday);
-
-			showdata.current.innerHTML = `<span> Firstname: ${data.firstname}</span><span>  Lastname: ${data.lastname}</span><span> Birthday: ${data.birthday}</span><span>  Age: ${data.age}</span>`;
+		try {
+			const response = await fetch('/api/getId', {
+				method: 'post',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					id: id
+				})
+			});
+			const data = await response.json();
+			console.log(data);
+			if (data.firstname === undefined) {
+				showdata.current.innerHTML = `<span> Employee not found</span>`;
+			} else {
+				data.birthday = dateFormat(data.birthday);
+	
+				showdata.current.innerHTML = `<span> Firstname: ${data.firstname}</span><span>  Lastname: ${data.lastname}</span><span> Birthday: ${data.birthday}</span><span>  Age: ${data.age}</span>`;
+			}
+			setId(0);
+	
+		} catch (error) {
+			console.log(error);	
 		}
-		setId(0);
 	};
 
-	const hundleUpdate = async evt => {
+	const handleUpdate = async evt => {
 		evt.preventDefault();
-		let edad = getAge(updatebirthday);
+		try {
+			let user = {
+				updatefirstname: updatefirstname,
+				updatelastname: updatelastname,
+			}
+			let edad = getAge(updatebirthday);
+			await userSchemaUpdate.validate(user, { abortEarly: false });
 
-		const response = await fetch('/api/updateUser', {
-			method: 'put',
-			headers: {
-				'Content-Type': 'application/json'
-			},
 
-			body: JSON.stringify({
-				id: updateId,
-				firstname: updatefirstname,
-				lastname: updatelastname,
-				birthday: updatebirthday,
-				age: edad
-			})
-		});
+			const response = await fetch('/api/updateUser', {
+				method: 'put',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+	
+				body: JSON.stringify({
+					id: updateId,
+					firstname: updatefirstname,
+					lastname: updatelastname,
+					birthday: updatebirthday,
+					age: edad
+				})
+			});
+	
+			setUpdateId('');
+			setupdateFirstName('');
+			setupdateLastName('');
+			setupdateBirthday('');
+	
+			list.current.innerHTML = '';
+			const data = await response.json();
+			console.log(data);
+	
+			showHideToggle();
+	
+		} catch (error) {
+			console.log(error);
+			for (let i = 0; i < error.errors.length; i++) {
+				alert(error.errors[i]);
+				
+			}
 
-		setUpdateId('');
-		setupdateFirstName('');
-		setupdateLastName('');
-		setupdateBirthday('');
-
-		list.current.innerHTML = '';
-		const data = await response.json();
-		console.log(data);
+		}
 	};
+	
+	function showHideToggle() {
+		createForm.current.classList.toggle('hide');
+		updateForm.current.classList.toggle('hide');
+		showDataForm.current.classList.toggle('hide');
+		deleteForm.current.classList.toggle('hide');
+		lista.current.classList.toggle('hide');
+	
+	}
 
 	const handleDelete = async evt => {
 		evt.preventDefault();
@@ -160,17 +258,19 @@ export default function Home() {
 					id: deleteId
 				})
 			});
+			list.current.innerHTML = '';
+			setDeleteId(0);
+	
 		} catch (error) {
 			console.log(error);
 		}
-		list.current.innerHTML = '';
-		setDeleteId(0);
 	};
 
 	return (
 		<div>
 			{/* Form create */}
-			<div className="form">
+			<div className="form" ref={createForm}>
+				<h2>Create Employee</h2>
 				<form>
 					<label className="label">
 						Enter Firstname:
@@ -190,14 +290,16 @@ export default function Home() {
 						/>
 					</label>
 
-					<button className="create" onClick={hundleCreate}>
+					<button className="create" onClick={handleCreate}>
 						Create Employee
 					</button>
 				</form>
 			</div>
 			{/* Form update */}
-			<div className="form">
+			<div className="form, hide" ref={updateForm}>
+				<h2>Update Employee</h2>
 				<form>
+					<button className='id'>Back</button>
 					<label className="label">
 						Enter ID:
 						<input type="text" value={updateId} onChange={e => setUpdateId(e.target.value)} />
@@ -219,25 +321,27 @@ export default function Home() {
 							onChange={e => setupdateBirthday(e.target.value)}
 						/>
 					</label>
-					<button className="create" onClick={hundleUpdate}>
+					<button className="create" onClick={handleUpdate}>
 						Update Employee
 					</button>
 				</form>
 			</div>
 			{/* Form get */}
-			<div className="form">
+			<div className="form" ref={showDataForm}>
+				<h2>Show Employee Data</h2>
 				<label className="label">
 					Enter Id:
 					<input type="number" value={id} onChange={e => setId(e.target.value)} />
 				</label>
-				<button className="id" onClick={hundleGetId}>
+				<button className="id" onClick={handleGetId}>
 					Show Employee Data
 				</button>
 				<p ref={showdata} className="showdata"></p>
 			</div>
 
 			{/* Form delete */}
-			<div className="form">
+			<div className="form" ref={deleteForm}>
+			<h2>Delete Employee Data</h2>
 				<label className="label">
 					Enter Id:
 					<input type="number" value={deleteId} onChange={e => setDeleteId(e.target.value)} />
@@ -247,13 +351,10 @@ export default function Home() {
 				</button>
 			</div>
 
-			<div className="lista">
+			<div className="lista" ref={lista}>
 				{' '}
 				{/* List */}
 				<h1>Employees</h1>
-				<button className="id" onClick={hundleList}>
-					List
-				</button>
 				<ul ref={list}></ul>
 			</div>
 		</div>

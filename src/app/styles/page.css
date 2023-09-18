@@ -1,3 +1,24 @@
+ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+li {
+	padding: 10px;
+	margin: 10px;
+	text-align: left;
+}
+
+li span {
+	margin-right: 10px;
+}
+
+h2 {
+	text-align: center;
+}
+
+
 .form {
 	margin: 100px auto;
 	max-width: 500px;
@@ -44,31 +65,23 @@
 	border-radius: 10px;
 }
 
-.id {
+.id, li button {
 	padding: 0.5rem 1rem;
 	font-size: 20px;
 	border: none;
 	background-color: rgb(83, 204, 83);
 	border-radius: 10px;
+	cursor: pointer;
+
 }
 
-ul {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-}
-
-li {
-	padding: 10px;
-	margin: 10px;
-}
-
-li span {
-	margin-right: 10px;
-}
 
 .showdata span {
 	margin: 1rem;
 	font-size: 20px;
 	display: block;
+}
+
+.hide {
+	display: none;
 }
