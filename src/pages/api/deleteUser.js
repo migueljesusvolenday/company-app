@@ -9,7 +9,7 @@ export default async function deleteUser(req, res) {
 			return res.status(404).json({ message: 'Employee not found' });
 		}
 
-		res.sendStatus(200).json(user);
+		res.status(200).json(user);
 	} catch (error) {
 		return res.status(500).json({ message: 'Something goes wrong' });
 	}

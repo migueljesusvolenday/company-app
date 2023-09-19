@@ -45,7 +45,16 @@ export default function Home() {
 		evt.preventDefault();
 		let idToUpdate = evt.target.parentNode.firstChild.textContent;
 		idToUpdate = idToUpdate.substring(4, idToUpdate.length);
+		let firstnameToUpdate = evt.target.parentNode.children[1].textContent;
+		firstnameToUpdate = firstnameToUpdate.substring(11, firstnameToUpdate.length);
+		let lastnameToUpdate = evt.target.parentNode.children[2].textContent;
+		lastnameToUpdate = lastnameToUpdate.substring(10, lastnameToUpdate.length);
+		let birthdayToUpdate = evt.target.parentNode.children[3].textContent;
+		birthdayToUpdate = birthdayToUpdate.substring(10, birthdayToUpdate.length);
 		setUpdateId(idToUpdate);
+		setupdateFirstName(firstnameToUpdate);
+		setupdateLastName(lastnameToUpdate);
+		setupdateBirthday(birthdayToUpdate);
 		showHideToggle();
 	}
 
@@ -182,7 +191,6 @@ export default function Home() {
 	
 				showdata.current.innerHTML = `<span> Firstname: ${data.firstname}</span><span>  Lastname: ${data.lastname}</span><span> Birthday: ${data.birthday}</span><span>  Age: ${data.age}</span>`;
 			}
-			setId(0);
 	
 		} catch (error) {
 			console.log(error);	
